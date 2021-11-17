@@ -41,5 +41,5 @@ class ShortUrlEntity(
     val country: String?,
     //guarda el dia de expiracion
     val expired: OffsetDateTime?,
-    val qr :  String?
+    val qr:  String?
 )

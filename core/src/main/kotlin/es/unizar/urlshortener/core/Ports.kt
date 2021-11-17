@@ -25,6 +25,15 @@ interface ValidatorService {
 }
 
 /**
+ * [SecurityService] is the port to the service that validates if an url is safe.
+ *
+ * **Note**: It is a design decision to create this port. It could be part of the core .
+ */
+interface SecurityService {
+    fun isSafe(url: String): Boolean
+}
+
+/**
  * [HashService] is the port to the service that creates a hash from a URL.
  *
  * **Note**: It is a design decision to create this port. It could be part of the core .
