@@ -20,7 +20,8 @@ data class ShortUrl(
     val redirection: Redirection,
     val created: OffsetDateTime = OffsetDateTime.now(),
     val properties: ShortUrlProperties = ShortUrlProperties(),
-    val expired: OffsetDateTime 
+    val expired: OffsetDateTime, 
+    val qr: String?
 )
 
 /**

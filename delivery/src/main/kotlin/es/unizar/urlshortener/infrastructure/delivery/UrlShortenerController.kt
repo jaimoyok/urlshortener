@@ -6,6 +6,8 @@ import es.unizar.urlshortener.core.ShortUrl
 import es.unizar.urlshortener.core.ShortUrlProperties
 import es.unizar.urlshortener.core.usecases.LogClickUseCase
 import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCase
+import es.unizar.urlshortener.core.usecases.CreateQRUseCase
+import es.unizar.urlshortener.core.usecases.GetQRUseCase
 import es.unizar.urlshortener.core.usecases.RedirectUseCase
 import org.springframework.hateoas.server.mvc.linkTo
 import org.springframework.http.HttpHeaders
@@ -28,12 +30,14 @@ interface UrlShortenerController {
      */
     fun redirectTo(id: String, request: HttpServletRequest): ResponseEntity<Void>
 
+
+    fun getQR(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Void>
     /**
      * Creates a short url from details provided in [data].
      *
      * **Note**: Delivery of use case [CreateShortUrlUseCase].
      */
-    fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut>
+    fun shortener(data: ShortUrlDataIn, request: HttpServletRequest, @RequestParam createQR: Boolean = false , @RequestParam daysValid: Int = 0 ): ResponseEntity<ShortUrlDataOut>
 
 }
 
@@ -64,7 +68,7 @@ class UrlShortenerControllerImpl(
     val redirectUseCase: RedirectUseCase,
     val logClickUseCase: LogClickUseCase,
     val createShortUrlUseCase: CreateShortUrlUseCase,
-    //val createQRUseCase: CreateQRUseCase,
+    val createQRUseCase: CreateQRUseCase,
     val getQRUseCase: GetQRUseCase
 ) : UrlShortenerController {
 
@@ -78,16 +82,17 @@ class UrlShortenerControllerImpl(
         }
 
     @GetMapping("/qr/{id:.*}")
-    overrride fun getQR(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Void>) ResponseEntity<Void> =
+    override fun getQR(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Void> =
         redirectUseCase.redirectTo(id).let {
             logClickUseCase.logClick(id, ClickProperties(ip = request.remoteAddr))
             val h = HttpHeaders()
             h.location = URI.create(it.target)
             ResponseEntity<Void>(h, HttpStatus.valueOf(it.mode))
         }
-    }
+   
     @PostMapping("/api/link", consumes = [ MediaType.APPLICATION_FORM_URLENCODED_VALUE ])
-    override fun shortener(data: ShortUrlDataIn, request: HttpServletRequest, @RequestParam createQR: Boolean = false , @RequestParam daysValid: Integer = 0 ): ResponseEntity<ShortUrlDataOut> =
+    override fun shortener(data: ShortUrlDataIn, request: HttpServletRequest, @RequestParam createQR: Boolean,
+     @RequestParam daysValid: Int): ResponseEntity<ShortUrlDataOut> =
         createShortUrlUseCase.create(
             url = data.url,
             data = ShortUrlProperties(
@@ -109,4 +114,4 @@ class UrlShortenerControllerImpl(
             )
             ResponseEntity<ShortUrlDataOut>(response, h, HttpStatus.CREATED)
         }
-}
+ }

@@ -47,10 +47,9 @@ fun ShortUrlEntity.toDomain() = ShortUrl(
         ip = ip,
         country = country
     ),
-    expired = expired
-)
-    
-)
+    expired = expired,
+    qr = qr
+)   
 
 /**
  * Extension method to convert a domain [ShortUrl] into a [ShortUrlEntity].
@@ -65,6 +64,7 @@ fun ShortUrl.toEntity() = ShortUrlEntity(
     safe = properties.safe,
     ip = properties.ip,
     country = properties.country,
-    expired = expired
+    expired = expired,
+    qr = qr
 )
 

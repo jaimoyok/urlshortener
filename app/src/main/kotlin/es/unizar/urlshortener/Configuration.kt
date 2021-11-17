@@ -43,4 +43,10 @@ class ApplicationConfiguration(
 
     @Bean
     fun createShortUrlUseCase() = CreateShortUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), hashService())
+
+    @Bean
+    fun createQRUseCase() = CreateQRUseCase()
+    
+    @Bean 
+    fun getQRUseCase() = GetQRUseCase()
 }
