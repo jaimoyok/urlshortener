@@ -22,6 +22,7 @@ class ClickEntity(
     val country: String?
 )
 
+
 /**
  * The [ShortUrlEntity] entity stores short urls.
  */
@@ -37,5 +38,8 @@ class ShortUrlEntity(
     val mode: Int,
     val safe: Boolean,
     val ip: String?,
-    val country: String?
+    val country: String?,
+    //guarda el dia de expiracion
+    val expired: OffsetDateTime?,
+    val qr :  String?
 )
