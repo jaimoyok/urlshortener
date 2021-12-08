@@ -60,7 +60,8 @@ class JsonObjectBuilder {
 /**
  * Implementation of the port [SecurityService].
  */
-class SecurityServiceImpl : SecurityService { 
+
+class SecurityServiceImpl : SecurityService {
     override fun isSafe(url: String): Boolean {
         val restTemplate: RestTemplate = RestTemplate()
         val ResourceUrl: String = "https://safebrowsing.googleapis.com/v4/threatMatches:find?key=AIzaSyBdtrER5q0nYLD3l7-iJB7PynRL_xmUV3w";
@@ -83,6 +84,7 @@ class SecurityServiceImpl : SecurityService {
         return safe
     }
 }   
+
 
 /**
  * Implementation of the port [HashService].

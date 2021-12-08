@@ -68,7 +68,8 @@ class UrlShortenerControllerTest {
             url = "http://example.com/",
             data = ShortUrlProperties(ip = "127.0.0.1"),
             days = 0
-        )).willReturn(ShortUrl("f684a3c4", Redirection("http://example.com/"),expired = OffsetDateTime.now().plusDays(0.toLong())))
+        )).willReturn(ShortUrl("f684a3c4", Redirection("http://example.com/"), expired = OffsetDateTime.now().plusDays(0.toLong())))
+
 
         mockMvc.perform(post("/api/link")
             .param("url", "http://example.com/")
