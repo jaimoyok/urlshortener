@@ -34,7 +34,7 @@ interface UrlShortenerController {
      *
      * **Note**: Delivery of use case [CreateShortUrlUseCase].
      */
-    fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut>
+    fun shortener(data: ShortUrlDataIn, request: HttpServletRequest, createQR: Boolean, daysValid: Int): ResponseEntity<ShortUrlDataOut>
 
 }
 
