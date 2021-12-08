@@ -41,3 +41,11 @@ interface SecurityService {
 interface HashService {
     fun hasUrl(url: String): String
 }
+/**
+ * [QRService] is the port to the service that generates a qr from a short URL and a format.
+ *
+ * **Note**: It is a design decision to create this port. It could be part of the core .
+ */
+interface QRService{
+    fun generateQR(url: String, format: QRFormat): ByteArray
+}

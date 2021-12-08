@@ -1,13 +1,10 @@
 package es.unizar.urlshortener.infrastructure.delivery
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import es.unizar.urlshortener.core.ClickProperties
-import es.unizar.urlshortener.core.ShortUrl
 import es.unizar.urlshortener.core.ShortUrlProperties
+import es.unizar.urlshortener.core.QRFormat
 import es.unizar.urlshortener.core.usecases.LogClickUseCase
 import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCase
-import es.unizar.urlshortener.core.usecases.CreateQRUseCase
-import es.unizar.urlshortener.core.usecases.GetQRUseCase
 import es.unizar.urlshortener.core.usecases.RedirectUseCase
 import org.springframework.hateoas.server.mvc.linkTo
 import org.springframework.http.HttpHeaders
@@ -37,7 +34,7 @@ interface UrlShortenerController {
      *
      * **Note**: Delivery of use case [CreateShortUrlUseCase].
      */
-    fun shortener(data: ShortUrlDataIn, request: HttpServletRequest, @RequestParam createQR: Boolean = false , @RequestParam daysValid: Int = 0 ): ResponseEntity<ShortUrlDataOut>
+    fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut>
 
 }
 
@@ -45,14 +42,17 @@ interface UrlShortenerController {
  * Data required to create a short url.
  */
 data class ShortUrlDataIn(
+    val qr: Boolean? = null,
     val url: String,
-    val sponsor: String? = null
+    val sponsor: String? = null,
+    val daysValid: Int = 0
 )
 
 /**
  * Data returned after the creation of a short url.
  */
 data class ShortUrlDataOut(
+    val qr: URI? = null,
     val url: URI? = null,
     val properties: Map<String, Any> = emptyMap()
 )
@@ -67,9 +67,7 @@ data class ShortUrlDataOut(
 class UrlShortenerControllerImpl(
     val redirectUseCase: RedirectUseCase,
     val logClickUseCase: LogClickUseCase,
-    val createShortUrlUseCase: CreateShortUrlUseCase,
-    val createQRUseCase: CreateQRUseCase,
-    val getQRUseCase: GetQRUseCase
+    val createShortUrlUseCase: CreateShortUrlUseCase
 ) : UrlShortenerController {
 
     @GetMapping("/tiny-{id:.*}")
@@ -89,29 +87,38 @@ class UrlShortenerControllerImpl(
             h.location = URI.create(it.target)
             ResponseEntity<Void>(h, HttpStatus.valueOf(it.mode))
         }
-   
+
     @PostMapping("/api/link", consumes = [ MediaType.APPLICATION_FORM_URLENCODED_VALUE ])
-    override fun shortener(data: ShortUrlDataIn, request: HttpServletRequest, @RequestParam createQR: Boolean,
-     @RequestParam daysValid: Int): ResponseEntity<ShortUrlDataOut> =
+    override fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut> =
         createShortUrlUseCase.create(
             url = data.url,
             data = ShortUrlProperties(
                 ip = request.remoteAddr,
                 sponsor = data.sponsor
-            ), 
-            qr = createQR,
-            days = daysValid
+            ),
+            days = data.daysValid
         ).let {
-            
             val h = HttpHeaders()
             val url = linkTo<UrlShortenerControllerImpl> { redirectTo(it.hash, request) }.toUri()
             h.location = url
-            val response = ShortUrlDataOut(
-                url = url,
-                properties = mapOf(
-                    "safe" to it.properties.safe
+            val response : ShortUrlDataOut
+            if (data.qr != null){
+                val qr = linkTo<QRControllerImpl> { redirectTo(it.hash, QRFormat(), request) }.toUri()
+                response = ShortUrlDataOut(
+                    url = url,
+                    qr = qr,
+                    properties = mapOf(
+                        "safe" to it.properties.safe
+                    )
                 )
-            )
+            } else{
+                response = ShortUrlDataOut(
+                    url = url,
+                    properties = mapOf(
+                        "safe" to it.properties.safe
+                    )
+                )
+            }
             ResponseEntity<ShortUrlDataOut>(response, h, HttpStatus.CREATED)
         }
  }
