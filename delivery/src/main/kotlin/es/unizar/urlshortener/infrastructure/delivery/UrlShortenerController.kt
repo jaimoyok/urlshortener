@@ -33,7 +33,7 @@ interface UrlShortenerController {
      *
      * **Note**: Delivery of use case [CreateShortUrlUseCase].
      */
-    fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut>
+    fun shortener(data: ShortUrlDataIn, request: HttpServletRequest, createQR: Boolean, daysValid: Int): ResponseEntity<ShortUrlDataOut>
 
 }
 
@@ -65,7 +65,7 @@ class UrlShortenerControllerImpl(
     val logClickUseCase: LogClickUseCase,
     val createShortUrlUseCase: CreateShortUrlUseCase,
     //val createQRUseCase: CreateQRUseCase,
-    val getQRUseCase: GetQRUseCase
+    //val getQRUseCase: GetQRUseCase
 ) : UrlShortenerController {
 
     @GetMapping("/tiny-{id:.*}")
@@ -77,17 +77,18 @@ class UrlShortenerControllerImpl(
             ResponseEntity<Void>(h, HttpStatus.valueOf(it.mode))
         }
 
-    @GetMapping("/qr/{id:.*}")
-    overrride fun getQR(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Void>) ResponseEntity<Void> =
-        redirectUseCase.redirectTo(id).let {
-            logClickUseCase.logClick(id, ClickProperties(ip = request.remoteAddr))
-            val h = HttpHeaders()
-            h.location = URI.create(it.target)
-            ResponseEntity<Void>(h, HttpStatus.valueOf(it.mode))
-        }
-    }
+    // @GetMapping("/qr/{id:.*}")
+    // overrride fun getQR(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Void> =
+    //     redirectUseCase.redirectTo(id).let {
+    //         logClickUseCase.logClick(id, ClickProperties(ip = request.remoteAddr))
+    //         val h = HttpHeaders()
+    //         h.location = URI.create(it.target)
+    //         ResponseEntity<Void>(h, HttpStatus.valueOf(it.mode))
+    //     }
+
+    
     @PostMapping("/api/link", consumes = [ MediaType.APPLICATION_FORM_URLENCODED_VALUE ])
-    override fun shortener(data: ShortUrlDataIn, request: HttpServletRequest, @RequestParam createQR: Boolean = false , @RequestParam daysValid: Integer = 0 ): ResponseEntity<ShortUrlDataOut> =
+    override fun shortener(data: ShortUrlDataIn, request: HttpServletRequest, @RequestParam(required=false,defaultValue="false") createQR: Boolean, @RequestParam(required=false,defaultValue="0") daysValid: Int): ResponseEntity<ShortUrlDataOut> =
         createShortUrlUseCase.create(
             url = data.url,
             data = ShortUrlProperties(

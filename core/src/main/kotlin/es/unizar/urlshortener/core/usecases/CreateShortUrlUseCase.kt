@@ -1,5 +1,4 @@
 package es.unizar.urlshortener.core.usecases
-package com.google.android.gms.safetynet;
 import es.unizar.urlshortener.core.*
 import java.util.Date
 import java.time.OffsetDateTime
