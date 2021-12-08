@@ -1,11 +1,9 @@
 package es.unizar.urlshortener
-
-import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCaseImpl
-import es.unizar.urlshortener.core.usecases.CreateQRUseCaseImplementor
-import es.unizar.urlshortener.core.usecases.LogClickUseCaseImpl
-import es.unizar.urlshortener.core.usecases.RedirectUseCaseImpl
-import es.unizar.urlshortener.core.usecases.ExpiredUseCaseImpl
+import es.unizar.urlshortener.core.SecurityService
+import es.unizar.urlshortener.core.usecases.*
+import es.unizar.urlshortener.infrastructure.delivery.QRServiceImpl
 import es.unizar.urlshortener.infrastructure.delivery.HashServiceImpl
+import es.unizar.urlshortener.infrastructure.delivery.SecurityServiceImpl
 import es.unizar.urlshortener.infrastructure.delivery.ValidatorServiceImpl
 import es.unizar.urlshortener.infrastructure.delivery.SecurityServiceImpl
 import es.unizar.urlshortener.infrastructure.repositories.ClickEntityRepository
@@ -42,17 +40,24 @@ class ApplicationConfiguration(
     fun hashService() = HashServiceImpl()
 
     @Bean
-    fun createQRUseCase() = CreateQRUseCaseImplementor()
+
+    fun securityService() = SecurityServiceImpl()
 
     @Bean
-    fun expiredUseCase() = ExpiredUseCaseImpl()
+    fun expiredService() = ExpiredUseCaseImpl()
 
     @Bean
-    fun redirectUseCase() = RedirectUseCaseImpl(shortUrlRepositoryService(),expiredUseCase())
+    fun redirectUseCase() = RedirectUseCaseImpl(shortUrlRepositoryService(), expiredService())
 
     @Bean
     fun logClickUseCase() = LogClickUseCaseImpl(clickRepositoryService())
 
     @Bean
-    fun createShortUrlUseCase() = CreateShortUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), hashService(),createQRUseCase(),securityService())
+    fun createShortUrlUseCase() = CreateShortUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), hashService(), securityService())
+
+    @Bean
+    fun qrService() = QRServiceImpl()
+
+    @Bean
+    fun qrUrlUseCase() = QRGeneratorUseCaseImpl(shortUrlRepositoryService(), qrService())
 }

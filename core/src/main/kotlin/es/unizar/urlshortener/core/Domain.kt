@@ -20,7 +20,8 @@ data class ShortUrl(
     val redirection: Redirection,
     val created: OffsetDateTime = OffsetDateTime.now(),
     val properties: ShortUrlProperties = ShortUrlProperties(),
-    val expired: OffsetDateTime 
+    val expired: OffsetDateTime
+    //val qr: Boolean?
 )
 
 /**
@@ -52,4 +53,19 @@ data class ClickProperties(
     val browser: String? = null,
     val platform: String? = null,
     val country: String? = null
+)
+/**
+ * A [QRFormat] specifies the format of a QR generation [QRService].
+ * By default, the [height] and [width] are 500.
+ * By default, the [color] is "0xFF000000".
+ * By default, the [background] is "0xFFFFFFFF"
+ * By default, the [typeImage] is "image/png"
+ */
+data class QRFormat (
+    val typeImage: String = "PNG",
+    val width: Int = 600,
+    val height: Int = 600,
+    val color: String = "0xFF000000",  //Negro
+    val background: String = "0xFFFFFFFF",  //Fondo Blanco
+    val errorCorrectionLevel: String = "L"
 )

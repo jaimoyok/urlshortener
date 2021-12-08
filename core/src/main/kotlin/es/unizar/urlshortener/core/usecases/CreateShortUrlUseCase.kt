@@ -1,6 +1,5 @@
 package es.unizar.urlshortener.core.usecases
 import es.unizar.urlshortener.core.*
-import java.util.Date
 import java.time.OffsetDateTime
 
 /**
@@ -10,18 +9,26 @@ import java.time.OffsetDateTime
  * **Note**: This is an example of functionality.
  */
 interface CreateShortUrlUseCase {
-    fun create(url: String, data: ShortUrlProperties, qr: Boolean, days: Int): ShortUrl
+    fun create(url: String, data: ShortUrlProperties, days: Int): ShortUrl
 }
-
-interface CreateQRUseCase {
+//interface GetQRUseCase {
+    //ojo
+    //fun getQR( hash: String) : String
+//}
+/*interface CreateQRUseCase {
     fun createQR( url: ShortUrl) : ShortUrl
 }
 
-class CreateQRUseCaseImplementor : CreateQRUseCase {
-    override fun createQR( url: ShortUrl) : ShortUrl {
+class GetQRUseCaseImpl : GetQRUseCase {
+    override fun getQR( hash: String) : String = "xD"
+} */
+
+/*class CreateQRUseCaseImplementor : CreateQRUseCase {
+    override fun createQR( url: String ) : String {
         return url;
     }
-}
+}*/
+
 /**
  * Implementation of [CreateShortUrlUseCase].
  */
@@ -29,13 +36,16 @@ class CreateShortUrlUseCaseImpl(
     private val shortUrlRepository: ShortUrlRepositoryService,
     private val validatorService: ValidatorService,
     private val hashService: HashService,
-    private val createQRUseCase: CreateQRUseCase,
     private val securityService: SecurityService
 ) : CreateShortUrlUseCase {
-    override fun create(url: String, data: ShortUrlProperties, qr: Boolean, days: Int): ShortUrl {
+    override fun create(url: String, data: ShortUrlProperties, days: Int): ShortUrl {
         if (validatorService.isValid(url)) {
             if (securityService.isSafe(url)) {
                 val id: String = hashService.hasUrl(url)
+                //var aux: String? = null
+                //if (qr){
+                //    aux = qrService.generateQR(id);
+                //}
                 val expiredDate = OffsetDateTime.now().plusDays(days.toLong())
                 val su = ShortUrl(
                     hash = id,
@@ -47,10 +57,9 @@ class CreateShortUrlUseCaseImpl(
                     ),
                     created = OffsetDateTime.now(),
                     expired = expiredDate
+                    //qr = aux
                 )
                 shortUrlRepository.save(su)
-                if (qr){
-                }
                 return su
             }else {
                 throw UnsafeUrlException(url)
