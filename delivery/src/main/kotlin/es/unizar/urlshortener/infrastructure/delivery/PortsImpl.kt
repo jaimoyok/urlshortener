@@ -60,6 +60,7 @@ class JsonObjectBuilder {
 /**
  * Implementation of the port [SecurityService].
  */
+
 class SecurityServiceImpl : SecurityService {
     override fun isSafe(url: String): Boolean {
         val restTemplate: RestTemplate = RestTemplate()
@@ -76,13 +77,14 @@ class SecurityServiceImpl : SecurityService {
             }
         }
         val  entity: HttpEntity<JSONObject> = HttpEntity<JSONObject>(requestJson,headers)
-        val response = restTemplate.postForObject(ResourceUrl, entity, JSONObject::class.java)
+        val response = restTemplate.postForObject(ResourceUrl, entity, JSONObject::class.java) 
         var safe: Boolean = false
         if (response!!.isEmpty())
             safe = true
         return safe
     }
-}
+}   
+
 
 /**
  * Implementation of the port [HashService].

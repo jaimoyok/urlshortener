@@ -63,6 +63,7 @@ fun ShortUrl.toEntity() = ShortUrlEntity(
     safe = properties.safe,
     ip = properties.ip,
     country = properties.country,
-    expired = expired
+    expired = expired,
+    //qr = qr
 )
 

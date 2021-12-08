@@ -70,6 +70,7 @@ class UrlShortenerControllerTest {
             days = 0
         )).willReturn(ShortUrl("f684a3c4", Redirection("http://example.com/"), expired = OffsetDateTime.now().plusDays(0.toLong())))
 
+
         mockMvc.perform(post("/api/link")
             .param("url", "http://example.com/")
             .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE))
