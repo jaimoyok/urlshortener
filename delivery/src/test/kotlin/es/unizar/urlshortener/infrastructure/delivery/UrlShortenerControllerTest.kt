@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import java.time.OffsetDateTime
 
 @WebMvcTest
 @ContextConfiguration(classes = [
@@ -65,8 +66,9 @@ class UrlShortenerControllerTest {
     fun `creates returns a basic redirect if it can compute a hash`() {
         given(createShortUrlUseCase.create(
             url = "http://example.com/",
-            data = ShortUrlProperties(ip = "127.0.0.1")
-        )).willReturn(ShortUrl("f684a3c4", Redirection("http://example.com/")))
+            data = ShortUrlProperties(ip = "127.0.0.1"),
+            days = 0
+        )).willReturn(ShortUrl("f684a3c4", Redirection("http://example.com/"), expired = OffsetDateTime.now().plusDays(0.toLong())))
 
         mockMvc.perform(post("/api/link")
             .param("url", "http://example.com/")
@@ -81,7 +83,8 @@ class UrlShortenerControllerTest {
     fun `creates returns bad request if it can compute a hash`() {
         given(createShortUrlUseCase.create(
             url = "ftp://example.com/",
-            data = ShortUrlProperties(ip = "127.0.0.1")
+            data = ShortUrlProperties(ip = "127.0.0.1"),
+            days = 0
         )).willAnswer { throw InvalidUrlException("ftp://example.com/") }
 
         mockMvc.perform(post("/api/link")
