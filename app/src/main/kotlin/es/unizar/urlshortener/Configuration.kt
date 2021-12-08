@@ -1,11 +1,9 @@
 package es.unizar.urlshortener
-import es.unizar.urlshortener.core.SecurityService
 import es.unizar.urlshortener.core.usecases.*
 import es.unizar.urlshortener.infrastructure.delivery.QRServiceImpl
 import es.unizar.urlshortener.infrastructure.delivery.HashServiceImpl
 import es.unizar.urlshortener.infrastructure.delivery.SecurityServiceImpl
 import es.unizar.urlshortener.infrastructure.delivery.ValidatorServiceImpl
-import es.unizar.urlshortener.infrastructure.delivery.SecurityServiceImpl
 import es.unizar.urlshortener.infrastructure.repositories.ClickEntityRepository
 import es.unizar.urlshortener.infrastructure.repositories.ClickRepositoryServiceImpl
 import es.unizar.urlshortener.infrastructure.repositories.ShortUrlEntityRepository
@@ -38,10 +36,6 @@ class ApplicationConfiguration(
 
     @Bean
     fun hashService() = HashServiceImpl()
-
-    @Bean
-
-    fun securityService() = SecurityServiceImpl()
 
     @Bean
     fun expiredService() = ExpiredUseCaseImpl()
