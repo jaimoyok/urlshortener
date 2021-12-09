@@ -37,4 +37,4 @@ out/
 .vscode/
 
 ### Claves ###
-.properties
+application.properties
