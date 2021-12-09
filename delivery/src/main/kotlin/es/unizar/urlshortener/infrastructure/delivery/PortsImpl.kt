@@ -20,6 +20,7 @@ import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.google.zxing.common.CharacterSetECI
 import com.google.zxing.qrcode.QRCodeWriter
 import es.unizar.urlshortener.core.*
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException
 import java.awt.image.BufferedImage
@@ -27,6 +28,7 @@ import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.*
 import javax.imageio.ImageIO
+
 
 /**
  * Implementation of the port [ValidatorService].
@@ -62,32 +64,37 @@ class JsonObjectBuilder {
  */
 
 class SecurityServiceImpl : SecurityService {
-    override fun isSafe(url: String): Boolean {
-        val restTemplate: RestTemplate = RestTemplate()
-        val ResourceUrl: String = "https://safebrowsing.googleapis.com/v4/threatMatches:find?key=AIzaSyBdtrER5q0nYLD3l7-iJB7PynRL_xmUV3w";
-        val headers: HttpHeaders  = HttpHeaders()
+
+    @Value("\${google.api-key}")
+    lateinit var apiKey: String
+
+    override fun isSafe(url: String): Boolean {  //safe a false y añadir a la cola el checkeo, no dejar usar hasta visto que segura, jugar con el numero de url por petición
+        val restTemplate: RestTemplate = RestTemplate()  
+        val ResourceUrl: String = "https://safebrowsing.googleapis.com/v4/threatMatches:find?key=" + apiKey;
+        val headers: HttpHeaders = HttpHeaders()
         val requestJson: JSONObject = json {
-            "threatInfo" to  json {
+            "threatInfo" to json {
                 "threatTypes" to arrayOf("MALWARE", "SOCIAL_ENGINEERING")
                 "platformTypes" to "WINDOWS"
                 "threatEntryTypes" to "URL"
-                "threatEntries" to  json {
+                "threatEntries" to json {
                     "url" to url
                 }
             }
         }
-        val  entity: HttpEntity<JSONObject> = HttpEntity<JSONObject>(requestJson,headers)
-        val response = restTemplate.postForObject(ResourceUrl, entity, JSONObject::class.java) 
+        val entity: HttpEntity<JSONObject> = HttpEntity<JSONObject>(requestJson, headers)
+        val response = restTemplate.postForObject(ResourceUrl, entity, JSONObject::class.java)
         var safe: Boolean = false
-        if (response!!.isEmpty())
+        if (response!!.isEmpty()) {
             safe = true
+        }
         return safe
     }
 }   
 
 
 /**
- * Implementation of the port [HashService].
+ * Implementation of the port [HashService]. COLA CONCURRENTE DESDE JAVA7, (CREARQR,
  */
 @Suppress("UnstableApiUsage")
 class HashServiceImpl : HashService {
