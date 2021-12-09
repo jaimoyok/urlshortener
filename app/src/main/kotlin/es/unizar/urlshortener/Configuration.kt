@@ -4,6 +4,7 @@ import es.unizar.urlshortener.infrastructure.delivery.QRServiceImpl
 import es.unizar.urlshortener.infrastructure.delivery.HashServiceImpl
 import es.unizar.urlshortener.infrastructure.delivery.SecurityServiceImpl
 import es.unizar.urlshortener.infrastructure.delivery.ValidatorServiceImpl
+import es.unizar.urlshortener.infrastructure.delivery.ReachabilityServiceImpl
 import es.unizar.urlshortener.infrastructure.repositories.ClickEntityRepository
 import es.unizar.urlshortener.infrastructure.repositories.ClickRepositoryServiceImpl
 import es.unizar.urlshortener.infrastructure.repositories.ShortUrlEntityRepository
@@ -33,6 +34,9 @@ class ApplicationConfiguration(
 
     @Bean
     fun securityService() = SecurityServiceImpl()
+
+    @Bean
+    fun reachabilityService() = ReachabilityServiceImpl()
 
     @Bean
     fun hashService() = HashServiceImpl()
