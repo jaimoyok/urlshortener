@@ -41,26 +41,30 @@ class CreateShortUrlUseCaseImpl(
     override fun create(url: String, data: ShortUrlProperties, days: Int): ShortUrl {
         if (validatorService.isValid(url)) {
             if (securityService.isSafe(url)) {
-                val id: String = hashService.hasUrl(url)
-                //var aux: String? = null
-                //if (qr){
-                //    aux = qrService.generateQR(id);
-                //}
-                val expiredDate = OffsetDateTime.now().plusDays(days.toLong())
-                val su = ShortUrl(
-                    hash = id,
-                    redirection = Redirection(target = url),
-                    properties = ShortUrlProperties(
-                        safe = data.safe,
-                        ip = data.ip,
-                        sponsor = data.sponsor
-                    ),
-                    created = OffsetDateTime.now(),
-                    expired = expiredDate
-                    //qr = aux
-                )
-                shortUrlRepository.save(su)
-                return su
+                if(reachabilityService.isReachable(url)) {
+                    val id: String = hashService.hasUrl(url)
+                    //var aux: String? = null
+                    //if (qr){
+                    //    aux = qrService.generateQR(id);
+                    //}
+                    val expiredDate = OffsetDateTime.now().plusDays(days.toLong())
+                    val su = ShortUrl(
+                        hash = id,
+                        redirection = Redirection(target = url),
+                        properties = ShortUrlProperties(
+                            safe = data.safe,
+                            ip = data.ip,
+                            sponsor = data.sponsor
+                        ),
+                        created = OffsetDateTime.now(),
+                        expired = expiredDate
+                        //qr = aux
+                    )
+                    shortUrlRepository.save(su)
+                    return su
+                }else {
+                    throw UnreachableUrlException(url)
+                }
             }else {
                 throw UnsafeUrlException(url)
             }
