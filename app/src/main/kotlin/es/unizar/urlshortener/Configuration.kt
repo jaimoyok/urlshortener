@@ -52,7 +52,9 @@ class ApplicationConfiguration(
 
     @Bean
     fun createShortUrlUseCase() = CreateShortUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), hashService(), securityService(), reachabilityService())
-
+    
+    @Bean 
+    fun expiredUseCase() = ExpiredUseCaseImpl(shortUrlRepositoryService()) 
     @Bean
     fun qrService() = QRServiceImpl()
 
