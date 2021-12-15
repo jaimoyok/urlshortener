@@ -55,6 +55,7 @@ class ApplicationConfiguration(
     
     @Bean 
     fun expiredUseCase() = ExpiredUseCaseImpl(shortUrlRepositoryService()) 
+    
     @Bean
     fun qrService() = QRServiceImpl()
 
