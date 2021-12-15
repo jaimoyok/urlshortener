@@ -38,8 +38,15 @@ class RedirectUseCaseImpl(
         }
     }   
 
-class ExpiredUseCaseImpl : ExpiredUseCase {
+class ExpiredUseCaseImpl (
+    private val shortUrlRepository: ShortUrlRepositoryService
+): ExpiredUseCase {
     override fun isExpired(shortUrl : ShortUrl) : Boolean {
-        return false
+        var diff = shortUrl.expired.compareTo(OffsetDateTime.now())
+        if(diff > 0){
+            shortUrlRepository.deleteById(shortUrl.hash)
+            return false
+        } 
+        else return true
     }
 }
