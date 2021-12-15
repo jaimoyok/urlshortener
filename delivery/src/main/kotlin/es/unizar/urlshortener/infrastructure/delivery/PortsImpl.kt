@@ -14,6 +14,7 @@ import java.util.Deque
 import java.util.ArrayDeque
 import java.net.URL
 import java.net.HttpURLConnection
+import java.net.UnknownHostException
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.WriterException
@@ -21,6 +22,7 @@ import com.google.zxing.client.j2se.MatrixToImageConfig
 import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.google.zxing.common.CharacterSetECI
 import com.google.zxing.qrcode.QRCodeWriter
+import org.springframework.beans.factory.annotation.Value
 import es.unizar.urlshortener.core.*
 import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException
@@ -64,16 +66,20 @@ class JsonObjectBuilder {
  */
 
 class SecurityServiceImpl : SecurityService {
+
+    @Value("\${google.api-key}")
+    lateinit var apiKey: String
+
     override fun isSafe(url: String): Boolean {
         val restTemplate: RestTemplate = RestTemplate()
-        val ResourceUrl: String = "https://safebrowsing.googleapis.com/v4/threatMatches:find?key=AIzaSyBdtrER5q0nYLD3l7-iJB7PynRL_xmUV3w";
+        val ResourceUrl: String = "https://safebrowsing.googleapis.com/v4/threatMatches:find?key=" + apiKey;
         val headers: HttpHeaders  = HttpHeaders()
         val requestJson: JSONObject = json {
-            "threatInfo" to  json {
+            "threatInfo" to json {
                 "threatTypes" to arrayOf("MALWARE", "SOCIAL_ENGINEERING")
                 "platformTypes" to "WINDOWS"
                 "threatEntryTypes" to "URL"
-                "threatEntries" to  json {
+                "threatEntries" to json {
                     "url" to url
                 }
             }
@@ -81,25 +87,30 @@ class SecurityServiceImpl : SecurityService {
         val  entity: HttpEntity<JSONObject> = HttpEntity<JSONObject>(requestJson,headers)
         val response = restTemplate.postForObject(ResourceUrl, entity, JSONObject::class.java) 
         var safe: Boolean = false
-        if (response!!.isEmpty())
+        if (response!!.isEmpty()){
             safe = true
+        }
         return safe
     }
 }
 
 class ReachabilityServiceImpl : ReachabilityService {
     override fun isReachable(url: String): Boolean {
+        var res = false;
+        try{
+            val urlt = URL(url)
 
-        val urlt = URL(url)
+            val con = urlt.openConnection() as HttpURLConnection
 
-        val con = urlt.openConnection() as HttpURLConnection
-
-        if (con.responseCode == 200){
-            return true
-        }else {
-            return false
+            if (con.responseCode == 200){
+                res = true;
+            }
+        }catch (e: Exception){
+            
+        }catch (uhe: UnknownHostException){
+            throw UnreachableUrlException(url)
         }
-    
+        return res;
     }
 }
 

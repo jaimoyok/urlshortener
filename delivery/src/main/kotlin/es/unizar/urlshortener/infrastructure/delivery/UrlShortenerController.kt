@@ -34,7 +34,7 @@ interface UrlShortenerController {
      *
      * **Note**: Delivery of use case [CreateShortUrlUseCase].
      */
-    fun shortener(data: ShortUrlDataIn, request: HttpServletRequest, createQR: Boolean, daysValid: Int): ResponseEntity<ShortUrlDataOut>
+    fun shortener(data: ShortUrlDataIn, request: HttpServletRequest, createQR: Boolean, daysValid: Int?): ResponseEntity<ShortUrlDataOut>
 
 }
 
@@ -44,8 +44,8 @@ interface UrlShortenerController {
 data class ShortUrlDataIn(
     val qr: Boolean? = null,
     val url: String,
-    val sponsor: String? = null,
-    val daysValid: Int = 0
+    val sponsor: String? = null
+    //val daysValid: Int = 0
 )
 
 /**
@@ -89,14 +89,14 @@ class UrlShortenerControllerImpl(
         }
 
     @PostMapping("/api/link", consumes = [ MediaType.APPLICATION_FORM_URLENCODED_VALUE ])
-    override fun shortener(data: ShortUrlDataIn, request: HttpServletRequest, createQR: Boolean, daysValid: Int): ResponseEntity<ShortUrlDataOut> =
+    override fun shortener(data: ShortUrlDataIn, request: HttpServletRequest, createQR: Boolean, daysValid: Int?): ResponseEntity<ShortUrlDataOut> =
         createShortUrlUseCase.create(
             url = data.url,
             data = ShortUrlProperties(
                 ip = request.remoteAddr,
                 sponsor = data.sponsor
             ),
-            days = data.daysValid
+            days = daysValid ?:0
         ).let {
             val h = HttpHeaders()
             val url = linkTo<UrlShortenerControllerImpl> { redirectTo(it.hash, request) }.toUri()
