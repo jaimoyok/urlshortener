@@ -25,10 +25,12 @@ $(document).ready(
                             + data.qr
                             + "</a></div></div></div>");
                     },
-                    error : function() {
-                        $("#result").html(
-                            "<div class='alert alert-danger lead'>ERROR</div>");
+                    error : function(xhr) {
+                       let err = JSON.parse(xhr.responseText)
+                       $("#result").html(
+                           "<div class='alert alert-danger lead'>" + err.message + "</div>");
                     }
                 });
             });
     });
+    

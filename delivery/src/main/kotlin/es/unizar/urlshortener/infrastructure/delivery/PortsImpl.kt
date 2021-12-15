@@ -12,6 +12,9 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import java.util.Deque
 import java.util.ArrayDeque
+import java.net.URL
+import java.net.HttpURLConnection
+import java.net.UnknownHostException
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.WriterException
@@ -19,6 +22,7 @@ import com.google.zxing.client.j2se.MatrixToImageConfig
 import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.google.zxing.common.CharacterSetECI
 import com.google.zxing.qrcode.QRCodeWriter
+import org.springframework.beans.factory.annotation.Value
 import es.unizar.urlshortener.core.*
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
@@ -68,6 +72,7 @@ class SecurityServiceImpl : SecurityService {
     @Value("\${google.api-key}")
     lateinit var apiKey: String
 
+
     override fun isSafe(url: String): Boolean {  //safe a false y añadir a la cola el checkeo, no dejar usar hasta visto que segura, jugar con el numero de url por petición
         val restTemplate: RestTemplate = RestTemplate()  
         val ResourceUrl: String = "https://safebrowsing.googleapis.com/v4/threatMatches:find?key=" + apiKey;
@@ -85,12 +90,33 @@ class SecurityServiceImpl : SecurityService {
         val entity: HttpEntity<JSONObject> = HttpEntity<JSONObject>(requestJson, headers)
         val response = restTemplate.postForObject(ResourceUrl, entity, JSONObject::class.java)
         var safe: Boolean = false
+
         if (response!!.isEmpty()) {
             safe = true
         }
         return safe
     }
-}   
+}
+
+class ReachabilityServiceImpl : ReachabilityService {
+    override fun isReachable(url: String): Boolean {
+        var res = false;
+        try{
+            val urlt = URL(url)
+
+            val con = urlt.openConnection() as HttpURLConnection
+
+            if (con.responseCode == 200){
+                res = true;
+            }
+        }catch (e: Exception){
+            
+        }catch (uhe: UnknownHostException){
+            throw UnreachableUrlException(url)
+        }
+        return res;
+    }
+}
 
 
 /**
