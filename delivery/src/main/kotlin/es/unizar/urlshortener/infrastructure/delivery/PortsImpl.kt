@@ -12,6 +12,8 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import java.util.Deque
 import java.util.ArrayDeque
+import java.net.URL
+import java.net.HttpURLConnection
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.WriterException
@@ -87,22 +89,17 @@ class SecurityServiceImpl : SecurityService {
 
 class ReachabilityServiceImpl : ReachabilityService {
     override fun isReachable(url: String): Boolean {
-        try {
-            URL urlt = new URL(url);
 
-            HttpURLConnection urlc = (HttpURLConnection) urlt.openConnection()
-            urlc.setRequestProperty("Connection", "close")
-            urlc.setConnectTimeout(1000 * 30) 
-            urlc.connect();
+        val urlt = URL(url)
 
-            if (urlc.getResponseCode() == 200) {
-                return new Boolean(true)
-            }
-        } catch (UnreachableUrlException e1) {
-            e1.printStackTrace()
-        } catch (IOException e) {
-            e.printStackTrace()
+        val con = urlt.openConnection() as HttpURLConnection
+
+        if (con.responseCode == 200){
+            return true
+        }else {
+            return false
         }
+    
     }
 }
 
