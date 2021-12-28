@@ -59,3 +59,11 @@ interface HashService {
 interface QRService{
     fun generateQR(url: String, format: QRFormat): ByteArray
 }
+
+/**
+ * [QRCodeRepositoryService] is the port to the repository that provides management to [QRCode].
+ */
+interface CodeQRRepositoryService {
+    fun findByKey(id: String): QRCode?
+    fun save(qrCode: QRCode): QRCode
+}

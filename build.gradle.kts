@@ -32,7 +32,11 @@ subprojects {
     }
 }
 
-project(":core") { }
+project(":core") {
+    dependencies {
+        "implementation" ("com.fasterxml.jackson.module:jackson-module-kotlin:2.11.+")
+    }
+}
 
 project(":repositories") {
     apply(plugin = "org.springframework.boot")
@@ -66,6 +70,7 @@ project(":delivery") {
 
         "testImplementation"("org.springframework.boot:spring-boot-starter-test")
         "testImplementation"("org.mockito.kotlin:mockito-kotlin:3.2.0")
+        "implementation"("org.springframework.boot:spring-boot-starter-amqp")
     }
     tasks.getByName<BootJar>("bootJar") {
         enabled = false
@@ -95,5 +100,7 @@ project(":app") {
         "testImplementation"("org.mockito.kotlin:mockito-kotlin:3.2.0")
         "testImplementation"("com.fasterxml.jackson.module:jackson-module-kotlin")
         "testImplementation"("org.apache.httpcomponents:httpclient")
+
+        "implementation"("org.springframework.boot:spring-boot-starter-amqp")
     }
 }

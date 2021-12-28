@@ -3,7 +3,7 @@ package es.unizar.urlshortener.infrastructure.repositories
 import java.time.OffsetDateTime
 import java.util.*
 import javax.persistence.*
-
+import es.unizar.urlshortener.core.QRFormat
 /**
  * The [ClickEntity] entity logs clicks.
  */
@@ -41,4 +41,23 @@ class ShortUrlEntity(
     val country: String?,
     //guarda el dia de expiracion
     val expired: OffsetDateTime
+)
+
+/**
+ * The [QRCodeEntity] entity stores qr codes.
+ */
+@Entity
+@Table(name = "qrcode")
+class QRCodeEntity(
+    @Id
+    val hash: String,
+    val typeImage: String,
+    val width: Int,
+    val height: Int,
+    val color: String,
+    val background: String,
+    val errorCorrectionLevel: String,
+    @Lob
+    @Column(name = "qrCode", columnDefinition="BLOB")
+    val qrCode: ByteArray?
 )

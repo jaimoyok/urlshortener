@@ -29,15 +29,15 @@ class RedirectUseCaseImpl(
 ) : RedirectUseCase {
     override fun redirectTo(key: String) = shortUrlRepository
         .findByKey(key)
-        ?.filterExpired()
+        //?.filterExpired()
         ?.redirection
         ?: throw RedirectionNotFound(key)
 
-    private fun ShortUrl.filterExpired() = when {
+    /*private fun ShortUrl.filterExpired() = when {
             expiredUseCase.isExpired(this) -> null
             else -> this
-        }
-    }   
+        }*/
+    }
 
 class ExpiredUseCaseImpl (
     private val shortUrlRepository: ShortUrlRepositoryService

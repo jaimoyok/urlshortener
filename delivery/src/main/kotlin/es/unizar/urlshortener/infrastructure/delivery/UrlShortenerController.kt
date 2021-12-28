@@ -1,6 +1,7 @@
 package es.unizar.urlshortener.infrastructure.delivery
 
 import es.unizar.urlshortener.core.ClickProperties
+import es.unizar.urlshortener.core.QRCode2
 import es.unizar.urlshortener.core.ShortUrlProperties
 import es.unizar.urlshortener.core.QRFormat
 import es.unizar.urlshortener.core.usecases.LogClickUseCase
@@ -14,6 +15,8 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.net.URI
 import javax.servlet.http.HttpServletRequest
+import org.springframework.amqp.rabbit.core.RabbitTemplate
+import org.springframework.beans.factory.annotation.Autowired
 
 /**
  * The specification of the controller.
@@ -44,7 +47,13 @@ interface UrlShortenerController {
 data class ShortUrlDataIn(
     val qr: Boolean? = null,
     val url: String,
-    val sponsor: String? = null
+    val sponsor: String? = null,
+    val qrTypeImage: String? = null,
+    val qrWidth: Int? = null,
+    val qrHeight: Int? = null,
+    val qrColor: String? = null,
+    val qrBackground: String? = null,
+    val qrErrorCorrectionLevel: String? = null,
     //val daysValid: Int = 0
 )
 
@@ -69,6 +78,10 @@ class UrlShortenerControllerImpl(
     val logClickUseCase: LogClickUseCase,
     val createShortUrlUseCase: CreateShortUrlUseCase
 ) : UrlShortenerController {
+
+    @Autowired
+    private val template: RabbitTemplate? = null
+
 
     @GetMapping("/tiny-{id:.*}")
     override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Void> =
@@ -102,8 +115,21 @@ class UrlShortenerControllerImpl(
             val url = linkTo<UrlShortenerControllerImpl> { redirectTo(it.hash, request) }.toUri()
             h.location = url
             val response : ShortUrlDataOut
-            if (data.qr != null){
-                val qr = linkTo<QRControllerImpl> { redirectTo(it.hash, QRFormat(), request) }.toUri()
+            if (data.qr != null && data.qr != false){
+                var fmt = QRFormat()
+                val typeImage: String = data.qrTypeImage ?: fmt.typeImage
+                val width: Int = data.qrWidth ?: fmt.width
+                val height: Int = data.qrHeight ?: fmt.height
+                val color: String = data.qrColor ?: fmt.color
+                val background: String = data.qrBackground ?: fmt.background
+                val errorCorrectionLevel: String = data.qrErrorCorrectionLevel ?: fmt.errorCorrectionLevel
+                fmt = QRFormat(typeImage,width,height,color,background,errorCorrectionLevel)
+
+                //Encolar tarea generación QRCODE usando RabbitMQ
+                template?.convertAndSend("QR_exchange", "QR_routingKey", QRCode2(it.hash, fmt))
+
+
+                val qr = linkTo<QRControllerImpl> { redirectTo(it.hash, request) }.toUri()
                 response = ShortUrlDataOut(
                     url = url,
                     qr = qr,
