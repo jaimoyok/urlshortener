@@ -1,5 +1,6 @@
 package es.unizar.urlshortener.infrastructure.delivery
 
+import es.unizar.urlshortener.core.CodeQRRepositoryService
 import es.unizar.urlshortener.core.usecases.LogClickUseCase
 import es.unizar.urlshortener.core.usecases.RedirectUseCase
 import org.springframework.http.HttpStatus
@@ -32,7 +33,8 @@ interface QRController {
 @RestController
 class QRControllerImpl(
     //Adding logClick
-    val qrUrlUseCase : QRGeneratorUseCase
+    val qrUrlUseCase : QRGeneratorUseCase,
+    val qrCodeRepository: CodeQRRepositoryService
 ) : QRController {
 
         @GetMapping("/getQR/{id}",
@@ -41,8 +43,8 @@ class QRControllerImpl(
         override fun redirectTo(
             @PathVariable id: String,
             request: HttpServletRequest): ResponseEntity<ByteArray> {
-            qrUrlUseCase.generateQR(id).let {
-                return ResponseEntity.status(HttpStatus.OK).body(it)
+            qrCodeRepository.findByKey(id).let {
+                return ResponseEntity.status(HttpStatus.OK).body(it?.qrCode)
             }
         }
     }

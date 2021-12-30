@@ -126,7 +126,7 @@ class UrlShortenerControllerImpl(
                 fmt = QRFormat(typeImage,width,height,color,background,errorCorrectionLevel)
 
                 //Encolar tarea generación QRCODE usando RabbitMQ
-                template?.convertAndSend("QR_exchange", "QR_routingKey", QRCode2(it.hash, fmt))
+                template?.convertAndSend("QRCODE_exchange", "QRCODE_routingKey", QRCode2(it.hash, fmt))
 
 
                 val qr = linkTo<QRControllerImpl> { redirectTo(it.hash, request) }.toUri()

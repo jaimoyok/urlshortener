@@ -37,7 +37,8 @@ class CreateShortUrlUseCaseImpl(
     private val validatorService: ValidatorService,
     private val hashService: HashService,
     private val securityService: SecurityService,
-    private val reachabilityService: ReachabilityService
+    private val reachabilityService: ReachabilityService,
+    private val qrUseCase: QRGeneratorUseCase
 ) : CreateShortUrlUseCase {
     override fun create(url: String, data: ShortUrlProperties, days: Int): ShortUrl {
         if (validatorService.isValid(url)) {
@@ -62,6 +63,7 @@ class CreateShortUrlUseCaseImpl(
                         //qr = aux
                     )
                     shortUrlRepository.save(su)
+                    qrUseCase.generateQR(id)
                     return su
                 }else {
                     throw UnreachableUrlException(url)

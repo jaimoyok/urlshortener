@@ -6,6 +6,7 @@ import es.unizar.urlshortener.infrastructure.delivery.SecurityServiceImpl
 import es.unizar.urlshortener.infrastructure.delivery.ReachabilityServiceImpl
 import es.unizar.urlshortener.infrastructure.delivery.ValidatorServiceImpl
 import es.unizar.urlshortener.infrastructure.repositories.*
+import es.unizar.urlshortener.rabbitmq.RabbitConsumer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -52,7 +53,7 @@ class ApplicationConfiguration(
     fun logClickUseCase() = LogClickUseCaseImpl(clickRepositoryService())
 
     @Bean
-    fun createShortUrlUseCase() = CreateShortUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), hashService(), securityService(), reachabilityService())
+    fun createShortUrlUseCase() = CreateShortUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), hashService(), securityService(), reachabilityService(), qrUrlUseCase())
 
     @Bean
     fun qrService() = QRServiceImpl()
@@ -60,4 +61,8 @@ class ApplicationConfiguration(
     @Bean
     //fun qrUrlUseCase() = QRGeneratorUseCaseImpl(shortUrlRepositoryService(), qrService())
     fun qrUrlUseCase() = QRGeneratorUseCaseImpl(shortUrlRepositoryService(), qrService(), reachabilityService(), codeQRRepositoryService())
+
+    @Bean
+    fun rbConsumer() = RabbitConsumer(qrService(), codeQRRepositoryService())
+
 }
