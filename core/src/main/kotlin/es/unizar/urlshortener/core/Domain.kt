@@ -85,10 +85,6 @@ data class QRCode2(
     @JsonProperty("format") val format: QRFormat = QRFormat()
 )
 
-data class Secu(
-    @JsonProperty("hash") val hash: String
-)
-
-data class Reach(
+data class Valid(
     @JsonProperty("hash") val hash: String
 )

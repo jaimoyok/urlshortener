@@ -20,35 +20,25 @@ class RabbitConfig {
     val EXCHANGE_QR = "QRCODE_exchange"
     val ROUTING_KEY_QR = "QRCODE_routingKey"
 
-    val QUEUE_SECURITY = "SECURITY_queue"
-    val EXCHANGE_SECURITY = "SECURITY_exchange"
-    val ROUTING_KEY_SECURITY = "SECURITY_routingKey"
-
-    val QUEUE_REACH = "REACH_queue"
-    val EXCHANGE_REACH = "REACH_exchange"
-    val ROUTING_KEY_REACH = "REACH_routingKey"
+    val QUEUE_VALIDITY = "VALIDITY_queue"
+    val EXCHANGE_VALIDITY = "VALIDITY_exchange"
+    val ROUTING_KEY_VALIDITY = "VALIDITY_routingKey"
 
     @Bean
     fun queueQR() = Queue(QUEUE_QR)
     @Bean 
-    fun queueSecurity() = Queue(QUEUE_SECURITY)
-    @Bean
-    fun queueReach() = Queue(QUEUE_REACH)
+    fun queueValidity() = Queue(QUEUE_VALIDITY)
 
 
     @Bean
     fun exchangeQR() = TopicExchange(EXCHANGE_QR)
     @Bean
-    fun exchangeSecurity() = TopicExchange(EXCHANGE_SECURITY)
-    @Bean
-    fun exchangeReach() = TopicExchange(EXCHANGE_REACH)
+    fun exchangeValidity() = TopicExchange(EXCHANGE_VALIDITY)
 
     @Bean
     fun bindingQR() = BindingBuilder.bind(queueQR()).to(exchangeQR()).with(ROUTING_KEY_QR)
     @Bean
-    fun bindingSecurity() = BindingBuilder.bind(queueSecurity()).to(exchangeSecurity()).with(ROUTING_KEY_SECURITY)
-    @Bean
-    fun bindingReach() = BindingBuilder.bind(queueReach()).to(exchangeReach()).with(ROUTING_KEY_REACH)
+    fun bindingValidity() = BindingBuilder.bind(queueValidity()).to(exchangeValidity()).with(ROUTING_KEY_VALIDITY)
 
 
     @Bean
