@@ -63,6 +63,6 @@ class ApplicationConfiguration(
     fun qrUrlUseCase() = QRGeneratorUseCaseImpl(shortUrlRepositoryService(), qrService(), reachabilityService(), codeQRRepositoryService())
 
     @Bean
-    fun rbConsumer() = RabbitConsumer(qrService(), codeQRRepositoryService())
+    fun rbConsumer() = RabbitConsumer(qrService(), codeQRRepositoryService(), reachabilityService(), securityService(), shortUrlRepositoryService())
 
 }

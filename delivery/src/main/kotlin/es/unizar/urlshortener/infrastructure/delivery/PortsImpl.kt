@@ -109,9 +109,7 @@ class ReachabilityServiceImpl : ReachabilityService {
                 res = true;
             }
         }catch (e: Exception){
-            
-        }catch (uhe: UnknownHostException){
-            throw UnreachableUrlException(url)
+            return false
         }
         return res;
     }

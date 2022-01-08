@@ -26,3 +26,4 @@ interface ClickEntityRepository : JpaRepository<ClickEntity, Long>
 interface QRCodeEntityRepository : JpaRepository<QRCodeEntity, String> {
     fun findByHash(hash: String): QRCodeEntity?
 }
+

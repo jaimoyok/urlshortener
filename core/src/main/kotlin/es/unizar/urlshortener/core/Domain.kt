@@ -21,8 +21,8 @@ data class ShortUrl(
     val redirection: Redirection,
     val created: OffsetDateTime = OffsetDateTime.now(),
     val properties: ShortUrlProperties = ShortUrlProperties(),
-    val expired: OffsetDateTime
-    //val qr: Boolean?
+    val expired: OffsetDateTime,
+    var reachable: Boolean
 )
 
 /**
@@ -40,7 +40,7 @@ data class Redirection(
 data class ShortUrlProperties(
     val ip: String? = null,
     val sponsor: String? = null,
-    val safe: Boolean = true,
+    var safe: Boolean = true,
     val owner: String? = null,
     val country: String? = null
 )
@@ -83,4 +83,12 @@ data class QRCode(
 data class QRCode2(
     @JsonProperty("hash") val hash: String,
     @JsonProperty("format") val format: QRFormat = QRFormat()
+)
+
+data class Secu(
+    @JsonProperty("hash") val hash: String
+)
+
+data class Reach(
+    @JsonProperty("hash") val hash: String
 )

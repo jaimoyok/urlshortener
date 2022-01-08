@@ -47,7 +47,8 @@ fun ShortUrlEntity.toDomain() = ShortUrl(
         ip = ip,
         country = country
     ),
-    expired = expired
+    expired = expired,
+    reachable = reachable
 )   
 
 /**
@@ -61,9 +62,11 @@ fun ShortUrl.toEntity() = ShortUrlEntity(
     owner = properties.owner,
     sponsor = properties.sponsor,
     safe = properties.safe,
+    reachable = reachable,
     ip = properties.ip,
     country = properties.country,
-    expired = expired,
+    expired = expired
+    
     //qr = qr
 )
 
