@@ -44,7 +44,7 @@ class ExpiredUseCaseImpl (
 ): ExpiredUseCase {
     override fun isExpired(shortUrl : ShortUrl) : Boolean {
         var diff = shortUrl.expired.compareTo(OffsetDateTime.now())
-        if(diff > 0){
+        if(diff < 0){
             shortUrlRepository.deleteById(shortUrl.hash)
             return true
         } 
