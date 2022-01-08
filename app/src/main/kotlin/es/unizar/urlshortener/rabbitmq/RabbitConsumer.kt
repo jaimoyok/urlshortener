@@ -33,7 +33,7 @@ class RabbitConsumer(
         }
     }
 
-    @RabbitListener(queues = ["SECURITY_queue"])
+    /* @RabbitListener(queues = ["SECURITY_queue"])
     fun consumeMessageFromQueueSeurity(secu: Secu) {
 
         var shortUrl = shortUrlRepository.findByKey(secu.hash)
@@ -50,24 +50,30 @@ class RabbitConsumer(
         else{
             println("Url no conocida, no se compruba seguridad")
         }
-    }
+    } */
 
-    @RabbitListener(queues = ["REACH_queue"])
-    fun consumeMessageFromQueueValid(reach: Reach) {
-        println ("me llega mensaje")
-        var shortUrl = shortUrlRepository.findByKey(reach.hash)
+    @RabbitListener(queues = ["VALIDITY_queue"])
+    fun consumeMessageFromQueueValid(valid: Valid) {
+        var shortUrl = shortUrlRepository.findByKey(valid.hash)
         if(shortUrl != null){
             if(reachabilityService.isReachable(shortUrl.redirection.target)){
-                println("La url es reach")
+                println("La url es reachable")
                 shortUrl.reachable = true
-                shortUrlRepository.save(shortUrl)
+                if(securityService.isSafe(shortUrl.redirection.target)){
+                    println("La url es segura")
+                    shortUrl.properties.safe = true
+                    Thread.sleep(5_000)
+                    shortUrlRepository.save(shortUrl)
+                }else{
+                    shortUrlRepository.deleteById(valid.hash)
+                }
             }
             else{
-                shortUrlRepository.deleteById(reach.hash)
+                shortUrlRepository.deleteById(valid.hash)
             }
         }
         else{
-            println("Url no conocida, no se compruba reach")
+            println("Url no conocida, no se comprueba reach")
         }
     }
 }

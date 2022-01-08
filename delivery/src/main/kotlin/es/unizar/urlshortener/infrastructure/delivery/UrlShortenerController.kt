@@ -2,8 +2,7 @@ package es.unizar.urlshortener.infrastructure.delivery
 
 import es.unizar.urlshortener.core.ClickProperties
 import es.unizar.urlshortener.core.QRCode2
-import es.unizar.urlshortener.core.Secu
-import es.unizar.urlshortener.core.Reach
+import es.unizar.urlshortener.core.Valid
 import es.unizar.urlshortener.core.ShortUrlProperties
 import es.unizar.urlshortener.core.QRFormat
 import es.unizar.urlshortener.core.usecases.LogClickUseCase
@@ -131,8 +130,7 @@ class UrlShortenerControllerImpl(
 
                 //Encolar tarea generación QRCODE usando RabbitMQ
                 template?.convertAndSend("QRCODE_exchange", "QRCODE_routingKey", QRCode2(it.hash, fmt))
-                template?.convertAndSend("SECURITY_exchange", "SECURITY_routingKey",Secu(it.hash))
-                template?.convertAndSend("REACH_exchange", "REACH_routingKey", Reach(it.hash))
+                template?.convertAndSend("VALIDITY_exchange", "VALIDITY_routingKey",Valid(it.hash))
 
 
                 val qr = linkTo<QRControllerImpl> { redirectTo(it.hash, request) }.toUri()
