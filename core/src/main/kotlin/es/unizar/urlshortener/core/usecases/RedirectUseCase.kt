@@ -30,6 +30,8 @@ class RedirectUseCaseImpl(
     override fun redirectTo(key: String) = shortUrlRepository
         .findByKey(key)
         ?.filterExpired()
+        ?.filterSafe()
+        ?.filterReachable()
         ?.redirection
         ?: throw RedirectionNotFound(key)
 
@@ -37,6 +39,16 @@ class RedirectUseCaseImpl(
             expiredUseCase.isExpired(this) -> null
             else -> this
         }
+
+    private fun ShortUrl.filterSafe() = when {
+        this.properties.safe -> this
+        else -> null
+    }
+
+    private fun ShortUrl.filterReachable() = when {
+        this.reachable-> this
+        else -> null
+    }
 
     }
 
