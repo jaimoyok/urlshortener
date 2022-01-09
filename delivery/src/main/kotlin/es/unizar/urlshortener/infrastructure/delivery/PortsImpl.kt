@@ -31,6 +31,8 @@ import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.*
 import javax.imageio.ImageIO
+import java.net.*
+
 
 
 /**
@@ -89,7 +91,9 @@ class SecurityServiceImpl : SecurityService {
         val entity: HttpEntity<JSONObject> = HttpEntity<JSONObject>(requestJson, headers)
         val response = restTemplate.postForObject(ResourceUrl, entity, JSONObject::class.java)
         var safe: Boolean = false
-
+        // if(response.status){ tolerancia a fallos si no devuelve 200 excepción
+            
+        // }
         if (response!!.isEmpty()) {
             safe = true
         }
@@ -105,10 +109,16 @@ class ReachabilityServiceImpl : ReachabilityService {
 
             val con = urlt.openConnection() as HttpURLConnection
 
+            con.setConnectTimeout(5000)
+
             if (con.responseCode == 200){
                 res = true;
             }
-        }catch (e: Exception){
+        }catch (e: SocketTimeoutException){
+            return false
+        }catch (e: UnknownHostException){
+            return false
+        }catch (e: Exception){  
             return false
         }
         return res;

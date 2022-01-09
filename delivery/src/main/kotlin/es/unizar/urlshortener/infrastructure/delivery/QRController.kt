@@ -4,6 +4,7 @@ import es.unizar.urlshortener.core.CodeQRRepositoryService
 import es.unizar.urlshortener.core.usecases.LogClickUseCase
 import es.unizar.urlshortener.core.usecases.RedirectUseCase
 import org.springframework.http.HttpStatus
+import es.unizar.urlshortener.core.QrNotFound
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -43,8 +44,12 @@ class QRControllerImpl(
         override fun redirectTo(
             @PathVariable id: String,
             request: HttpServletRequest): ResponseEntity<ByteArray> {
-            qrCodeRepository.findByKey(id).let {
-                return ResponseEntity.status(HttpStatus.OK).body(it?.qrCode)
+            var qr = qrCodeRepository.findByKey(id)
+            if (qr == null){
+                throw QrNotFound(id)
+            }
+            else{
+                return ResponseEntity.status(HttpStatus.OK).body(qr.qrCode)
             }
         }
     }

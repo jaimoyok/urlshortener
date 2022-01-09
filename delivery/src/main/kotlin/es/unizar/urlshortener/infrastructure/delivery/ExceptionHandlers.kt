@@ -4,6 +4,8 @@ import es.unizar.urlshortener.core.InvalidUrlException
 import es.unizar.urlshortener.core.RedirectionNotFound
 import es.unizar.urlshortener.core.UnsafeUrlException
 import es.unizar.urlshortener.core.UnreachableUrlException
+import es.unizar.urlshortener.core.QrNotFound
+import es.unizar.urlshortener.core.NotReadyUrlException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -41,6 +43,16 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler(value = [UnreachableUrlException::class])
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected fun unreachableUrls(ex: UnreachableUrlException) = ErrorMessage(HttpStatus.BAD_REQUEST.value(), ex.message)
+
+    @ResponseBody
+    @ExceptionHandler(value = [NotReadyUrlException::class])
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected fun notReadyUrls(ex: NotReadyUrlException) = ErrorMessage(HttpStatus.BAD_REQUEST.value(), ex.message)
+
+    @ResponseBody
+    @ExceptionHandler(value = [QrNotFound::class])
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected fun notQrUrls(ex: QrNotFound) = ErrorMessage(HttpStatus.BAD_REQUEST.value(), ex.message)
 }
 
 data class ErrorMessage(

@@ -54,11 +54,11 @@ class CreateShortUrlUseCaseImpl(
                 hash = id,
                 redirection = Redirection(target = url),
                 properties = ShortUrlProperties(
-                    safe = false,
+                    safe = null,
                     ip = data.ip,
                     sponsor = data.sponsor
                 ),
-                reachable = false,
+                reachable = null,
                 created = OffsetDateTime.now(),
                 expired = expiredDate
                 //qr = aux

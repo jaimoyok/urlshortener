@@ -22,7 +22,7 @@ data class ShortUrl(
     val created: OffsetDateTime = OffsetDateTime.now(),
     val properties: ShortUrlProperties = ShortUrlProperties(),
     val expired: OffsetDateTime,
-    var reachable: Boolean
+    var reachable: Boolean?
 )
 
 /**
@@ -40,7 +40,7 @@ data class Redirection(
 data class ShortUrlProperties(
     val ip: String? = null,
     val sponsor: String? = null,
-    var safe: Boolean = true,
+    var safe: Boolean? = null,
     val owner: String? = null,
     val country: String? = null
 )

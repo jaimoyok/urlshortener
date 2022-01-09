@@ -2,6 +2,9 @@ package es.unizar.urlshortener.core.usecases
 
 import es.unizar.urlshortener.core.Redirection
 import es.unizar.urlshortener.core.RedirectionNotFound
+import es.unizar.urlshortener.core.UnsafeUrlException
+import es.unizar.urlshortener.core.UnreachableUrlException
+import es.unizar.urlshortener.core.NotReadyUrlException
 import es.unizar.urlshortener.core.ShortUrlRepositoryService
 import es.unizar.urlshortener.core.ShortUrl
 import java.time.OffsetDateTime
@@ -40,17 +43,34 @@ class RedirectUseCaseImpl(
             else -> this
         }
 
-    private fun ShortUrl.filterSafe() = when {
-        this.properties.safe -> this
-        else -> null
+    private fun ShortUrl.filterSafe() :ShortUrl {
+        if (this.properties.safe != null){
+            if(this.properties.safe == true){
+                return this
+            } 
+            else{
+                throw UnsafeUrlException(this.hash)
+            }
+        }
+        else{
+            throw NotReadyUrlException(this.hash)
+        }
     }
 
-    private fun ShortUrl.filterReachable() = when {
-        this.reachable-> this
-        else -> null
+    private fun ShortUrl.filterReachable() :ShortUrl {
+        if (this.reachable != null){
+            if(this.reachable == true){
+                return this
+            } 
+            else{
+                throw UnreachableUrlException(this.hash)
+            }
+        }
+        else{
+            throw NotReadyUrlException(this.hash)
+        }
     }
-
-    }
+}
 
     
 

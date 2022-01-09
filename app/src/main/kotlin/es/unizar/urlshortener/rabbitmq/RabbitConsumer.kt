@@ -56,21 +56,9 @@ class RabbitConsumer(
     fun consumeMessageFromQueueValid(valid: Valid) {
         var shortUrl = shortUrlRepository.findByKey(valid.hash)
         if(shortUrl != null){
-            if(reachabilityService.isReachable(shortUrl.redirection.target)){
-                println("La url es reachable")
-                shortUrl.reachable = true
-                if(securityService.isSafe(shortUrl.redirection.target)){
-                    println("La url es segura")
-                    shortUrl.properties.safe = true
-                    Thread.sleep(5_000)
-                    shortUrlRepository.save(shortUrl)
-                }else{
-                    shortUrlRepository.deleteById(valid.hash)
-                }
-            }
-            else{
-                shortUrlRepository.deleteById(valid.hash)
-            }
+            shortUrl.reachable = (reachabilityService.isReachable(shortUrl.redirection.target)) 
+            shortUrl.properties.safe = (securityService.isSafe(shortUrl.redirection.target))
+            shortUrlRepository.save(shortUrl)
         }
         else{
             println("Url no conocida, no se comprueba reach")

@@ -138,14 +138,14 @@ class UrlShortenerControllerImpl(
                     url = url,
                     qr = qr,
                     properties = mapOf(
-                        "safe" to it.properties.safe
+                        "safe" to false
                     )
                 )
             } else{
                 response = ShortUrlDataOut(
                     url = url,
                     properties = mapOf(
-                        "safe" to it.properties.safe
+                        "safe" to false
                     )
                 )
             }
