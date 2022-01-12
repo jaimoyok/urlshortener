@@ -1,10 +1,12 @@
 package es.unizar.urlshortener.infrastructure.delivery
 
+
 import es.unizar.urlshortener.core.*
 import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCase
 import es.unizar.urlshortener.core.usecases.LogClickUseCase
 import es.unizar.urlshortener.core.usecases.RedirectUseCase
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.never
 import org.mockito.kotlin.verify
@@ -42,7 +44,7 @@ class UrlShortenerControllerTest {
     fun `redirectTo returns a redirect when the key exists`() {
         given(redirectUseCase.redirectTo("key")).willReturn(Redirection("http://example.com/"))
         var aux = mockMvc.perform(get("/tiny-{id}", "key"))
-        Thread.sleep(1_000)
+       
         aux
             .andExpect(status().isTemporaryRedirect)
             .andExpect(redirectedUrl("http://example.com/"))
@@ -64,16 +66,44 @@ class UrlShortenerControllerTest {
     }
 
     @Test
+    fun `redirectTo returns a bad request when the url is not reachable`() {
+        given(redirectUseCase.redirectTo("unreachable_url_key"))
+            .willAnswer { throw UnreachableUrlException("unreachable_url_key") }
+
+        mockMvc.perform(get("/tiny-{id}", "unreachable_url_key"))
+            .andDo(print())
+            .andExpect(status().isBadRequest)
+            .andExpect(jsonPath("$.statusCode").value(400))
+
+        verify(logClickUseCase, never()).logClick("unreachable_url_key", ClickProperties(ip = "127.0.0.1"))
+    } 
+
+    @Test
+    fun `redirectTo returns a bad request when the url is not safe`() {
+        given(redirectUseCase.redirectTo("unsafe_url_key"))
+            .willAnswer { throw UnsafeUrlException("unsafe_url_key") }
+
+        mockMvc.perform(get("/tiny-{id}", "unsafe_url_key"))
+            .andDo(print())
+            .andExpect(status().isBadRequest)
+            .andExpect(jsonPath("$.statusCode").value(400))
+
+        verify(logClickUseCase, never()).logClick("unreachable_url_key", ClickProperties(ip = "127.0.0.1"))
+    } 
+
+    @Test
     fun `creates returns a basic redirect if it can compute a hash`() {
         given(createShortUrlUseCase.create(
             url = "http://example.com/",
             data = ShortUrlProperties(ip = "127.0.0.1"),
             days = 1
-        )).willReturn(ShortUrl("f684a3c4", Redirection("http://example.com/"), expired = OffsetDateTime.now().plusDays(1.toLong()),reachable = null))
+        )).willReturn(ShortUrl("f684a3c4", Redirection("http://example.com/"), properties = ShortUrlProperties( ip = "127.0.0.1"),
+                    expired = OffsetDateTime.now().plusDays(1.toLong()), reachable = null))
 
 
         mockMvc.perform(post("/api/link")
             .param("url", "http://example.com/")
+            .param("days", "1")
             .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE))
             .andDo(print())
             .andExpect(status().isCreated)
@@ -82,7 +112,7 @@ class UrlShortenerControllerTest {
     }
 
     @Test
-    fun `creates returns bad request if it can compute a hash`() {
+    fun `creates returns bad request if it can't compute a hash`() {
         given(createShortUrlUseCase.create(
             url = "ftp://example.com/",
             data = ShortUrlProperties(ip = "127.0.0.1"),
@@ -91,8 +121,10 @@ class UrlShortenerControllerTest {
 
         mockMvc.perform(post("/api/link")
             .param("url", "ftp://example.com/")
+            .param("days", "0")
             .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE))
             .andExpect(status().isBadRequest)
             .andExpect(jsonPath("$.statusCode").value(400))
     }
+    
 }
