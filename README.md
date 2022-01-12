@@ -125,6 +125,15 @@ The project offers a minimum set of functionalities:
 * **Generate a QR**
   See in `core` the use case `QRGeneratorUseCase` and in `delivery` the REST controller `QRControler`
 
+* **Validate URL securyrity** 
+  See in `delevire` the service `SecurityServiceImpl`
+
+* **Validate URL Reacheability**
+  See in `delevire` the service `ReachabilityServiceImpl`
+
+* **Expired time to short ULS**
+  See in `core` the use case `ExpiredUseCaseImpl`
+
 
 The objects in the domain are:
 
