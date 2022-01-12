@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate
 import java.nio.charset.StandardCharsets
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
+import org.springframework.web.client.HttpClientErrorException
 import java.util.Deque
 import java.util.ArrayDeque
 import java.net.URL
@@ -88,16 +89,26 @@ class SecurityServiceImpl : SecurityService {
                 }
             }
         }
-        val entity: HttpEntity<JSONObject> = HttpEntity<JSONObject>(requestJson, headers)
-        val response = restTemplate.postForObject(ResourceUrl, entity, JSONObject::class.java)
         var safe: Boolean = false
-        // if(response.status){ tolerancia a fallos si no devuelve 200 excepción
-            
-        // }
-        if (response!!.isEmpty()) {
-            safe = true
+        try{
+            val entity: HttpEntity<JSONObject> = HttpEntity<JSONObject>(requestJson, headers)
+            val response = restTemplate.postForObject(ResourceUrl, entity, JSONObject::class.java)
+            if (response!!.isEmpty()) {
+                safe = true
+            }
+            return safe
         }
-        return safe
+        catch (e: HttpClientErrorException ) {
+            println("Exception when calling to safebrowsing:")
+            println(e)
+            return false
+        }
+        catch(e: Exception){
+            println("Exception when calling to safebrowsing:")
+            println(e)
+            return false
+        }
+
     }
 }
 
