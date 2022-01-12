@@ -28,6 +28,26 @@ Sometimes, your feature will not be as simple, and it would require:
 
 Features that require the connection to a third party or having more than a single app will be rewarded. 
 
+## RabbitMQ requiered
+
+Need install RabbitMQ and start it in your computer.
+
+If you have not installed it yet:
+* Follow this [guide](https://www.rabbitmq.com/install-windows.html) if you use windows.
+* Follow this [guide](https://www.rabbitmq.com/install-debian.html) if you use debian.
+
+Once Rabbit is installed, it will run automatically with the default settings, but you can enable management server with this command: 
+
+```shell
+rabbitmq-plugins enable rabbitmq_management
+```
+It need restart rabbit or restart computer to work.
+
+For get managent dashboard open browser and enter http://localhost:15672/ and login.
+
+* user : guest
+* pass : guest
+
 ## Run
 
 The application can be run as follows:
@@ -81,7 +101,7 @@ $ curl -v http://localhost:8080/tiny-6bb9db44
 * Connection #0 to host localhost left intact
 ```
 
-## Build and Run
+## Build and Run 
 
 The uberjar can be built and then run with:
 
@@ -89,7 +109,6 @@ The uberjar can be built and then run with:
 ./gradlew build
 java -jar app/build/libs/app.jar
 ```
-
 ## Functionalities
 
 The project offers a minimum set of functionalities:
@@ -103,6 +122,10 @@ The project offers a minimum set of functionalities:
 * **Log redirects**.
   See in `core` the use case `LogClickUseCase` and in `delivery` the REST controller `UrlShortenerController`.
 
+* **Generate a QR**
+  See in `core` the use case `QRGeneratorUseCase` and in `delivery` the REST controller `QRControler`
+
+
 The objects in the domain are:
 
 * `ShortUrl`: the minimum information about a short url
@@ -110,13 +133,20 @@ The objects in the domain are:
 * `ShortUrlProperties`: a handy way to extend data about a short url
 * `Click`: the minimum data captured when a redirection is logged
 * `ClickProperties`: a handy way to extend data about a click
+* `QRCode`: the minimum information about QR
+* `QRFormat`: the format used to generate QR
 
 ## Delivery
 
 The above functionality is available through a simple API:
 
-* `POST /api/link` which creates a short URL from data send by a form.
+* `POST /api/link` which creates a short URL from data send by a form, It suport 3 parameters:
+  * `url` : url that you want shorter
+  * `days` : how many days ulr is active
+  * `qr` : true if you want generate qr, false if you dont want it 
 * `GET /tiny-{id}` where `id` identifies the short url, deals with redirects, and logs use (i.e. clicks).
+* `GET /getQR/{id}` where `id` identifies the qr, deals with qr. The `id` of the qr is the same as that of the corresponding shortened page
+
 
 In addition, `GET /` returns the landing page of the system. 
 
@@ -129,6 +159,14 @@ There are only two tables.
 
 * **shorturl** that represents short url and encodes in each row `ShortUrl` related data 
 * **click** that represents clicks and encodes in each row `Click` related data
+* **QRCode** that represents  QR and encodes in each row `QRCode` related data
+
+## RabbitMQ Queues
+
+* `VALIDITY_queue` : get url and check that it is safe and reacheability
+
+* `QRCODE_queue` : get QR format and url and generate a new QR code
+
 
 ## Reference Documentation
 
@@ -138,7 +176,7 @@ For further reference, please consider the following sections:
 * [Spring Boot Gradle Plugin Reference Guide](https://docs.spring.io/spring-boot/docs/2.5.5/gradle-plugin/reference/html/)
 * [Spring Web](https://docs.spring.io/spring-boot/docs/2.5.5/reference/htmlsingle/#boot-features-developing-web-applications)
 * [Spring Data JPA](https://docs.spring.io/spring-boot/docs/2.5.5/reference/htmlsingle/#boot-features-jpa-and-spring-data)
-
+* [RabbitMQ](https://www.rabbitmq.com/documentation.html)
 ## Guides
 
 The following guides illustrate how to use some features concretely:
@@ -147,4 +185,5 @@ The following guides illustrate how to use some features concretely:
 * [Serving Web Content with Spring MVC](https://spring.io/guides/gs/serving-web-content/)
 * [Building REST services with Spring](https://spring.io/guides/tutorials/bookmarks/)
 * [Accessing Data with JPA](https://spring.io/guides/gs/accessing-data-jpa/)
+* [Building a Messages Queue with Rabbit](https://spring.io/guides/gs/messaging-rabbitmq/)
 
