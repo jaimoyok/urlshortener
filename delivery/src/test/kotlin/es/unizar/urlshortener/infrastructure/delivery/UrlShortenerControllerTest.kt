@@ -44,7 +44,6 @@ class UrlShortenerControllerTest {
     fun `redirectTo returns a redirect when the key exists`() {
         given(redirectUseCase.redirectTo("key")).willReturn(Redirection("http://example.com/"))
         var aux = mockMvc.perform(get("/tiny-{id}", "key"))
-       
         aux
             .andExpect(status().isTemporaryRedirect)
             .andExpect(redirectedUrl("http://example.com/"))

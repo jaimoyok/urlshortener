@@ -75,7 +75,7 @@ class SecurityServiceImpl : SecurityService {
     lateinit var apiKey: String
 
 
-    override fun isSafe(url: String): Boolean {  //safe a false y añadir a la cola el checkeo, no dejar usar hasta visto que segura, jugar con el numero de url por petición
+    override fun isSafe(url: String): Boolean {  
         val restTemplate: RestTemplate = RestTemplate()  
         val ResourceUrl: String = "https://safebrowsing.googleapis.com/v4/threatMatches:find?key=" + apiKey;
         val headers: HttpHeaders = HttpHeaders()
