@@ -55,7 +55,7 @@ data class ShortUrlDataIn(
     val qrColor: String? = null,
     val qrBackground: String? = null,
     val qrErrorCorrectionLevel: String? = null,
-    val days: Int  
+    val days: Int = 1
 )
 
 /**
@@ -113,7 +113,6 @@ class UrlShortenerControllerImpl(
             days = data.days
         ).let {
 
-            //print(data)
             val h = HttpHeaders()
             val url = linkTo<UrlShortenerControllerImpl> { redirectTo(it.hash, request) }.toUri()
             h.location = url
@@ -142,6 +141,7 @@ class UrlShortenerControllerImpl(
                     )
                 )
             } else{
+                template?.convertAndSend("VALIDITY_exchange", "VALIDITY_routingKey",Valid(it.hash))
                 response = ShortUrlDataOut(
                     url = url,
                     properties = mapOf(

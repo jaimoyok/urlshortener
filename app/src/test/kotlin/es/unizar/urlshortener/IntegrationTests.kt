@@ -65,8 +65,6 @@ class HttpRequestTest {
         assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "click")).isEqualTo(1)
     }
 
-
-
     @Test
     fun `redirectTo returns a not found when the key does not exist`() {
         val response = restTemplate.getForEntity("http://localhost:$port/f684a3c4", String::class.java)
@@ -110,6 +108,9 @@ class HttpRequestTest {
 
         val data: MultiValueMap<String, String> = LinkedMultiValueMap()
         data["url"] = url
+        data["days"] = "1"
+
+        println(data)
 
         return restTemplate.postForEntity(
             "http://localhost:$port/api/link",
