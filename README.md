@@ -28,7 +28,7 @@ Sometimes, your feature will not be as simple, and it would require:
 
 Features that require the connection to a third party or having more than a single app will be rewarded. 
 
-## RabbitMQ requiered
+## RabbitMQ required
 
 Need install RabbitMQ and start it in your computer.
 
@@ -41,9 +41,9 @@ Once Rabbit is installed, it will run automatically with the default settings, b
 ```shell
 rabbitmq-plugins enable rabbitmq_management
 ```
-It need restart rabbit or restart computer to work.
+You need to restart rabbit or restart the computer to work.
 
-For get managent dashboard open browser and enter http://localhost:15672/ and login.
+For the management dashboard, open browser at http://localhost:15672/ and login.
 
 * user : guest
 * pass : guest
@@ -125,11 +125,11 @@ The project offers a minimum set of functionalities:
 * **Generate a QR**
   See in `core` the use case `QRGeneratorUseCase` and in `delivery` the REST controller `QRControler`
 
-* **Validate URL securyrity** 
-  See in `delevire` the service `SecurityServiceImpl`
+* **Validate URL security** 
+  See in `delivery` the service `SecurityServiceImpl`
 
 * **Validate URL Reacheability**
-  See in `delevire` the service `ReachabilityServiceImpl`
+  See in `delivery` the service `ReachabilityServiceImpl`
 
 * **Expired time to short ULS**
   See in `core` the use case `ExpiredUseCaseImpl`
